@@ -1,0 +1,922 @@
+
+NMEA messages supported by GLL 
+
+The following messages are supported by the GLL:
+•Standard NMEA messages: ◦$GPGGA - Global positioning system (GPS) fix data 
+◦$GPRMC - Recommended Minimum Specific GPS/TRANSIT Data 
+◦$GPGSA, $GNGSA, $QZGSA - GNSS Active Satellites and DOP 
+◦$GPGSV, $GLGSV, $QZGSV - GNSS satellites in view
+
+•Proprietary messages: ◦$PGLOR,[],CPU - CPU Loading 
+◦$PGLOR,[],FIN - Request completion status 
+◦$PGLOR,[],FIX - Time To Fix 
+◦$PGLOR,[],FTS - Factory Test Status 
+◦$PGLOR,[],GFC - GeoFence Fix 
+◦$PGLOR,[],HLA - Value of HULA sensors 
+◦$PGLOR,[],IMS - IMES messages 
+◦$PGLOR,[],LSQ - Least squares GNSS fix 
+◦$PGLOR,[],NEW - Indicate new GPS request 
+◦$PGLOR,[],PFM - Platform Status 
+◦$PGLOR,[],PPS - Indicate PPS time corrections 
+◦$PGLOR,[],PWR - Power consumption report 
+◦$PGLOR,[],RID - Version Information 
+◦$PGLOR,[],SAT - GPS Satellite information 
+◦$PGLOR,[],SIO - Serial I/O status report 
+◦$PGLOR,[],SPA - Spectrum analyzer results 
+◦$PGLOR,[],STA - GLL status 
+◦$PGLOR,[],SVD - SV Dopplers detected in the false alarm test.
+
+• 
+•Some HALs generate additional network or system performance messages: ◦$PGLOR,NET - Report network information 
+◦$PGLOR,[],SMx - Report GPS Summary Information 
+
+ 
+Time, position and fix-related data for a GPS receiver.
+
+$GPGGA,hhmmss.ss,llll.ll,a,yyyyy.yy,a,x,xx,x.x,x.x,M,x.x,M,x.x,xxxx*CC<CR><LF>
+ 1     2         3       3 4        4 5 6  7   8   9 A   B C   D
+
+The fields are:
+•1 - Sentence identifier 
+•2 - UTC of position 
+•3 - Latitude N/S 
+•4 - Longitude E/W 
+•5 - GPS quality indicator (see note 1) 
+•6 - Number of satellites in use, 00-12, may be different from the number in view 
+•7 - Measurement Horizontal estimated error / 10.
+See GPGSA for true DOP. 
+•8 - Antenna altitude above/below mean sea level (geoid) 
+•9 - Units of antenna altitude, M = meters 
+•A - Geoidal separation (see note 3) 
+•B - Units of geoidal separation, M = meters 
+•C - Age of differential GPS data (see note 2) 
+•D - Differential reference station ID, 0000-1023 
+•CC - checksum
+
+NOTE 1 GPS quality indicator:
+•0 = fix not available or invalid 
+•1 = GPS SPS mode, fix valid 
+•2 = differential GPS, SPS mode, fix valid 
+•3 = GPS PPS mode, fix valid 
+•4 = Real Time Kinematic. Satellite system used in RTK mode with fixed integers 
+•5 = Float RTK. Satellite system used in RTK mode with FLOATing integers 
+•6 = Estimated (dead reckoning) mode 
+•7 = Manual input mode 
+•8 = Simulator mode The GPS Quality Indicator shall not be a null field.
+
+NOTE 2 Time in seconds since last SC104 type 1 or 9 update, null field when DGPS is not used.
+
+NOTE 3 Geoidal separation: the difference between the WGS-84 earth ellipsoid surface and mean sea level (geoid) surface. Negative values sea level surface below the WGS-84 ellipsoid surface. 
+
+Time, position and fix-related data for a GPS receiver.
+
+$GPGGA,hhmmss.ss,llll.ll,a,yyyyy.yy,a,x,xx,x.x,x.x,M,x.x,M,x.x,xxxx*CC<CR><LF>
+ 1     2         3       3 4        4 5 6  7   8   9 A   B C   D
+
+The fields are:
+•1 - Sentence identifier 
+•2 - UTC of position 
+•3 - Latitude N/S 
+•4 - Longitude E/W 
+•5 - GPS quality indicator (see note 1) 
+•6 - Number of satellites in use, 00-12, may be different from the number in view 
+•7 - Measurement Horizontal estimated error / 10.
+See GPGSA for true DOP. 
+•8 - Antenna altitude above/below mean sea level (geoid) 
+•9 - Units of antenna altitude, M = meters 
+•A - Geoidal separation (see note 3) 
+•B - Units of geoidal separation, M = meters 
+•C - Age of differential GPS data (see note 2) 
+•D - Differential reference station ID, 0000-1023 
+•CC - checksum
+
+NOTE 1 GPS quality indicator:
+•0 = fix not available or invalid 
+•1 = GPS SPS mode, fix valid 
+•2 = differential GPS, SPS mode, fix valid 
+•3 = GPS PPS mode, fix valid 
+•4 = Real Time Kinematic. Satellite system used in RTK mode with fixed integers 
+•5 = Float RTK. Satellite system used in RTK mode with FLOATing integers 
+•6 = Estimated (dead reckoning) mode 
+•7 = Manual input mode 
+•8 = Simulator mode The GPS Quality Indicator shall not be a null field.
+
+NOTE 2 Time in seconds since last SC104 type 1 or 9 update, null field when DGPS is not used.
+
+NOTE 3 Geoidal separation: the difference between the WGS-84 earth ellipsoid surface and mean sea level (geoid) surface. Negative values sea level surface below the WGS-84 ellipsoid surface. 
+
+ 
+
+$GPGSA, $GNGSA, $QZGSA - GNSS Active Satellites and DOP 
+
+This sentence provides details on the nature of the fix.
+
+It includes the numbers of the satellites being used in the current solution and the DOP. DOP (dilution of precision) is an indication of the effect of satellite geometry on the accuracy of the fix. It is a unitless number where smaller is better. For 3D fixes using 4 satellites a 1.0 would be considered to be a perfect number. For over determined solutions it is possible to see numbers below 1.0. There are differences in the way the PRN's are presented which can effect the ability of some programs to display this data. For example, in the example shown below there are 5 satellites in the solution and the null fields are scattered indicating that the almanac would show satellites in the null positions that are not being used as part of this solution. Other receivers might output all of the satellites used at the beginning of the sentence with the null field all stacked up at the end. This difference accounts for some satellite display programs not always being able to display the satellites being tracked.
+
+If multiple GPS, GLONASS, etc. satellites are used, separate GSA sentences with different talker IDs are sent.
+
+  $GPGSA,A,3,04,05,,09,12,,,24,,,,,2.5,1.3,2.1*39<CR><LF>
+   1     2 3 4                     5   6   7
+
+Where:
+•1 - Sentence identifier. Can be one of: ◦GPGSA - GPS 
+◦GNGSA - GLONASS and GPS 
+◦QZGSA - QZSS 
+◦IMGSA - IMES 
+◦BDGSA - BEIDOU
+
+•2 - Selection of 2D or 3D fix:
+A = Auto selection
+M = manual
+ 
+•3 - 3 = 3D fix - other values include:
+1 = no fix
+2 = 2D fix 
+•4 - PRNs of satellites used for fix (space for 12) 
+•5 - Position Dilution Of Precision (PDOP) 
+•6 - Horizontal Dilution Of Precision (HDOP) 
+•7 - Vertical Dilution Of Precision (VDOP) 
+•CC - checksum 
+
+$GPGSV, $GLGSV, $QZGSV - GNSS satellites in view 
+
+Number of satellites (SV) in view, satellite ID numbers, elevation, azimuth and SNR value.
+
+Four satellites maximum per transmission, additional satellite data sent in second or third message. Total number of messages being transmitted and the number of the message being transmitted is indicated in the first two fields. If multiple GPS, GLONASS, etc. satellites are in view, separate GSV sentences with different talker IDs are sent. 
+
+    $GPGSV, x, x, xx, xx, xx, xxx, xx .............., xx, xx, xxx, xx*CC<CR><LF>
+        1   2  3   4   5   6   7   8
+
+The fields are:
+•1 - Sentence identifier. The three NMEA talkers are: ◦GPGSV - GPS 
+◦GLGSV - GLONASS 
+◦QZGSV - QZSS
+
+•2 - Message number (see note 1), 1 to 9 
+•3 - Total number of messages (see note 1), 1 to 9 
+•4 - Total number of satellites in view 
+•5 - Satellite ID number (see note 3) 
+•6 - Elevation, degrees (90 degrees maximum) 
+•7 - Azimuth, degrees true, 000 to 359 
+•8 - SNR (C/No) 00-99 dB-Hz, null when not tracking
+
+NOTE 1 Satellite information may require the transmission of multiple messages, all containing identical field formats. The first field specifies the total number of messages, minimum value = 1. The second field identifies the order of this message (message number), minimum value = 1. For efficiency it is recommended that null fields be used in the additional sentences where the data is unchanged from the first sentence.
+
+NOTE 2 One to four sets of "Satellite ID-Elevation-Azimuth-SNR" are allowed per message. Null fields are not required for unused sets when less than four sets are transmitted.
+
+NOTE 3 Satellite ID numbers. To avoid posssible confusion caused by repetition of satellite ID numbers when using multiple satellite systems, the following convention has been adopted:
+•GPS satellites are identified by their PRN numbers, which range from 1 to 32. 
+•The WAAS system has reserved numbers 33 through 64 to identify its satellites. 
+•Numbers 65 through 96 are reserved for GLONASS satellites. ◦GLONASS satellites are identified by 64 plus satellite slot numbers. 
+◦The slot numbers are 1 through 24 for the full GLONASS constellation of 24 satellites, thus giving a range of 65 through 88. 
+◦The numbers 89 through 96 are available if slot numbers above 24 are allocated to on-orbit spares. 
+
+
+UNIX PGLOR,CPU items 
+
+The PGLOR,0,CPU format string is: UNIX,MS,PROC,LOADX10,SYS,CHILD,CLKKHZ Where:
+•UNIX - Identifies Unix HAL.
+
+Data is the revision (0)
+•MS - elapsed time (ms) 
+•PROC - amount of time spent inside this process (ms) 
+•LOADX10 - PROC/MS * 1000 (units of "tens of percent") 
+•SYS - System time of this process (a high number indicates lots of I/O and/or device driver/OS inefficiencies.) 
+•CHILD - Child time (user+kernel) from this process (should be zero) 
+•CLKKHZ - Average clock speed in KHz 
+
+UNIX PGLOR,CPU items 
+
+The PGLOR,0,CPU format string is: UNIX,MS,PROC,LOADX10,SYS,CHILD,CLKKHZ Where:
+•UNIX - Identifies Unix HAL.
+
+Data is the revision (0)
+•MS - elapsed time (ms) 
+•PROC - amount of time spent inside this process (ms) 
+•LOADX10 - PROC/MS * 1000 (units of "tens of percent") 
+•SYS - System time of this process (a high number indicates lots of I/O and/or device driver/OS inefficiencies.) 
+•CHILD - Child time (user+kernel) from this process (should be zero) 
+•CLKKHZ - Average clock speed in KHz 
+  $PGLOR,1,FIN,xx,xx*CC<CR><LF>
+         1  2  3  4
+
+Where:
+•1 - Sentence version [1] 
+•2 - Sentence identifier 
+•3 - completion status:
+0 - Success
+1 - Failure 
+•4 - request ID 
+•CC - checksum
+
+
+
+
+
+
+ $PGLOR,0,FIN,xx*CC<CR><LF>
+         1 2   3
+
+
+Where:
+•1 - Sentence version [0] 
+•2 - Sentence identifier 
+•3 - completion status:
+0 - Success
+1 - Failure 
+•CC - checksum
+
+$PGLOR,1,FIX - Time To Fix 
+
+ $PGLOR,1,FIX,15.4,14.2*CC
+        1  2    3    4
+
+The fields are:
+•1 - Sentence version [1] 
+•2 - Sentence identifier 
+•3 - TTFF - Time To Fix relative to when the request was received 
+•4 - TTFF - Time To Fix relative to when GLL was turned on 
+•CC - checksum
+  $PGLOR,0,HLA,hhmmss.ss,L,x,Al,x,A,x,H,x,x,M,x,Ac,x,Gr,x,S,x.x,x,Sx,x.x,x,T,x,Tr,x,Mn,x*CC<CR><LF>
+         1   2      3      4    5   6   7 8   9    A    B    C  D     E  F   G    H    I
+
+Where:
+•1 - Sentence version [0] 
+•2 - Sentence identifier 
+•3 - UTC 
+•4 - Confidence of the External Location input ◦0 = unknown 
+◦1 = low 
+◦2 = medium 
+◦3 = high
+
+•5 - Altitude from the External Location Sensor [m] 
+•6 - Altitude from the Altitude Sensor [m] 
+•7 - Heading from the Heading Sensor [degree] 
+•8 - Use status of the Heading Sensor input ◦D = disabled, 
+◦I = ignored 
+◦V = Valid
+
+•9 - Motion sensor state: ◦0 = unknown 
+◦1 = not moving 
+◦2 = walking 
+◦3 = driving 
+◦4 = running
+
+•A - Accelerometer calibration state: ◦0 = not calibrated 
+◦1 = calibrated
+
+•B - Gyro calibration state: ◦0 = not calibrated 
+◦1 = calibrated
+
+•C - Along track speed from sensor [m/s] 
+•D - Use status for along track speed from sensor: ◦D = disabled, 
+◦I = ignored 
+◦V = Valid
+
+•E - Cross track speed from sensor [m/s] 
+•F - Use status for cross track speed from sensor: ◦D = disabled, 
+◦I = ignored 
+◦V = Valid
+
+•G - Turning sensor state ◦0 = unknown 
+◦1 = not turning 
+◦2 = turning
+
+•H - Turning rate from sensor [degree/s] 
+•I - PND mounted state sensor state ◦0 = unknown 
+◦1 = not mounted 
+◦2 = mounted
+
+•CC - checksum
+
+PGLOR,LSQ shows the GNSS fix data obtained with least squares, time, LSQ position, and fix-related data for a GNSS receiver.
+
+ $PGLOR,0,LSQ,hhmmss.ss,llll.ll,N,yyyy.yy,E,h.h,h.h,a.a,a.a,a.a,s.s,s.s,v.v,v.v,tt.t,tt.t,ss*CC<CR><LF>
+        0 1   2         3       a 4       a 5   a   6   a   b   7   a   8   a   9    a    10
+
+Where:
+•0 - Sentence version [0] 
+•1 - Sentence identifier 
+•2 - UTC of position 
+•3 - Latitude, N/S ◦a - N=north, S=south
+
+•4 - Longitude ◦a - E=east, W=West
+
+•5 - Horizontal error RMS (m) ◦a - HDOP horizontal dilution of precision
+
+•6 - Antenna altitude above/below WGS84 ellipsoid (m) ◦a - Altitude error RMS (m) 
+◦b - VDOP vertical dilution of precision
+
+•7 - Horizontal Speed (m/s) ◦a - Horizontal Speed error RMS (m/s)
+
+•8 - Vertical Speed (m/s) ◦a - Vertical Speed error RMS (m/s)
+
+•9 - Track, azimuth clockwise from true North (degrees) ◦a - Track error RMS (degrees)
+
+•10 - Number of satellites in use in LS fix, may be different from the number in view, and from number used in Kalman Filter and shown in $GPGGA 
+•CC - checksum
+
+NOTE : If the LS fix is valid, the latitude and longitude fields contain numbers. Otherwise these fields are empty. It is possible that $GPGGA will report a fix when PGLOR,LSQ does not.
+
+ 
+
+$PGLOR,1,NEW - Indicate new GPS request 
+
+  $PGLOR,1,NEW,ttt,ii,nnn,vvv[,nnn,vvv]*CC<CR><LF>
+         1  2  3   4  5   6    5'  6'
+
+Where:
+•1 - Sentence version [1] 
+•2 - Sentence identifier 
+•3 - Session type: ◦PERFIX - periodic position fix 
+◦PERMEAS - periodic measurements 
+◦SSFIX - single-shot position fix 
+◦SSMEAS - single-shot measurement 
+◦FACTORY - factory 
+◦SPA - spectrum analyzer 
+◦CW - CW factory test 
+◦CEPH - collect ephemeris 
+◦TIMER - timer 
+◦QCNTIN - query (frequency assistance, or count in) 
+◦QSYNC - query (fine time assistance, or sync-in) 
+◦QRQASST - query (requested assistance) 
+◦QGPS - query (GPS data) 
+◦PLATFT - platform test
+
+•4 - ID for this request (cycles from 0 to 32767) 
+•5 - Per-request parameter name: ◦PER - period in milliseconds (PERFIX, PERMEAS, FACTORY) 
+◦TO - timeout in seconds (SSFIX and SSMEAS, TIMER, QSYNC) 
+◦QOP - Quality of position desired (horizontal accuracy mask in meters) (PERFIX and SSFIX) 
+◦AGE - Maximum position fix age in seconds (SSFIX) 
+◦FTS - Factory test item (enum GL_FACT_TEST_ITEMS) 
+◦MODE - Factory test or frequency scan request (enum GL_FACT_TEST_MODE) 
+◦NUM - number of timer events (TIMER) 
+◦MASK - bitmask of GPS data (QGPS) 
+◦US - CW microseconds 
+◦FI, FE, STEP - FRQSCAN (spectrum analyzer) parameters for initial frequency, end frequency, frequency step. 
+◦SVID - FRQSCAN parameter is 1 for GPS or 59 for GLONASS. 
+◦RBW, VBW - FRQSCAN parameters for resolution and video bandwidth (in Hz) 
+◦AGCLOCK: 1 = FRQSCAN parameter indicating AGC is locked after ~5s into the test; 2 = AGC is set to look for small spurs 
+◦PT - platform test number 
+◦P0,P1,P2,P3,P4,P5 - platform test parameters
+
+•6 - Per-request parameter value as indicated for each field #5 
+•5' 6' - Fields 5 and 6 repeat as needed for the type of request. 
+•CC - checksum
+
+[Version: 1]
+
+Previous versions:
+
+[Version: 0] $PGLOR,0,NEW - Indicate new GPS request
+
+  $PGLOR,1,END,utc,tsb,ttt,iii,[nnn,vvv]*CC<CR><LF>
+         1  2  3   4   5   6    7   8
+
+Where:
+•1 - Sentence version [1] 
+•2 - Sentence identifier 
+•3 - UTC 
+•4 - time since beginning of request 
+•5 - Session type: ◦PERFIX - periodic position fix 
+◦PERMEAS - periodic measurements 
+◦SSFIX - single-shot position fix 
+◦SSMEAS - single-shot measurement 
+◦FACTORY - factory 
+◦SPA - spectrum analyzer 
+◦CW - CW factory test 
+◦CEPH - collect ephemeris 
+◦TIMER - timer 
+◦QCNTIN - query (frequency assistance, or count in) 
+◦QSYNC - query (fine time assistance, or sync-in) 
+◦QRQASST - query (requested assistance) 
+◦QGPS - query (GPS data) 
+◦PLATFT - platform test
+
+•6 - ID for this request (cycles from 0 to 32767) 
+•7,8 - parameter, value pairs same as in 'NEW' message 
+•CC - checksum
+
+$PGLOR,2,PFM - Platform Status 
+
+ $PGLOR,2,PFM,HAL,P,0,0,0.0,0.0,RF,P,125.,0.0,0,RTC,40.0,P,STO,F,LTO,-,SW,P,CNTIN,MP,220,OSC,P57,F23,P22*76
+        1         2 3 4  5   6     7   8   9  A      C   D     E     F    G       H   I      J   K   L
+
+The fields are:
+•2 - Sentence version [2] 
+•HAL performance has items 2 through 6: ◦2 - Passed/Failed/Inconclusive P/F/- 
+◦3 - Number of detected Tx errors 0 to 999 Must be 0 to pass 
+◦4 - Number of detected Rx errors 0 to 999 Must be 0 to pass 
+◦5 - Packets with latency less than 300 ms 0 to 100% Must be 0% to pass 
+◦6 - Packets with latency more than 1000 ms 0 to 100% Must be 0% to pass
+
+•RF performance has items 7 through A: ◦7 - Passed/Failed/Inconclusive P/F/- 
+◦8 - Maximum signal strength [dBm] -180 to -120 Must be -125 or higher to pass. Measures GPS antenna performance. 
+◦9 - GPS WER (on SV >-135 dBm) 0 to 100 [%] Must be 0% to pass 
+◦A - Clock stability P/F/- 40ppb/first 10s; 10ppb/10s; 5ppb/s. See PGLOR,STA for details
+
+•RTC results have two items: ◦C - RTC error [ppm] 
+◦D - Pass/Fail/Not confirmed P/F/-
+
+•STO - Non volatile storage ◦E - Pass/Fail/Not confirmed P/F/-
+
+•LTO - LTO ◦F - Pass/Fail/Not confirmed P/F/-
+
+•SW - Software ◦G - Pass/Fail P/F
+
+•CNTIN - TCXO Calibration ◦H - Status: ◾ST - started 
+◾NM - not measured. Failure of the HAL or RILD. 
+◾MP - measured and passed. 
+◾MF - measured and failed. 
+◾CP - measured and passed, then offset subsequently confirmed within offset uncertainty by GNSS clock measurements. 
+◾CF - measured and passed, then offset subsequently confirmed to be wrong.
+
+
+
+I - Calibration clock offset report. Error code details for "NM" are:
+•UNUSED - CNTIN was not used 
+•OOR - Calculated Frequency out of range 
+•NOIN - No input frequency was detected on CNTIN pin 
+•UDEAD- HAL failed to call RefFreqStatus() on GlEngineOnFreqUpdate callback request 
+•UCANCEL - User reported refrence frequency as unreliable during the CNTIN interval 
+•MOLD - User measurement of the calibration frequency is too old 
+•MUNC - User measurement of the calibration frequency is too uncertain 
+•UNK - Unknown error
+
+OSC - Reference Clock Drift are in the format Pnn, Fnn or ,, for Pass, Fail, Not confirmed. "nn" is a confidence factor: 100 is the best confidence, 0 is worst. Three separate time spans are reported: J - drift within the first 10s of operatation less than 40ppb K - drift after the second 10s (or any subsequent 10s) of operatation was less than 10ppb L - drift was less than 5ppb/s (after the initial 20s data collection)
+
+See PGLOR,STA for specific clock offsets.
+•CC - checksum
+
+SW,F indicates the GLL had a recoverable internal error. If possible enable full logging, repeat the test conditions, and send the log file to your Broadcom GPS AE or FAE.
+
+ 
+
+$PGLOR,0,PPS,DDMMYY,HHMMSS.UUU,DDMMYY,HHMMSS.UUU,MMM.UUU,P,A,O,*CC<CR><LF>
+         1 2   3      4          5      6          7       8 9,10
+
+
+Where:
+•1 - Sentence version [0] 
+•2 - Sentence identifier 
+•3 - UTC date ◦DD - days (1..31) 
+◦MM - month (1..12) 
+◦YY - year (00..99)
+
+•4 - UTC time ◦HH - hours (0..23) 
+◦MM - minutes (0..59) 
+◦SS - seconds (0..59) 
+◦UUU - milliseconds (0..999)
+
+•5 - Platform System Date of the PPS pulse ◦DD - days (1..31) 
+◦MM - month (1..12) 
+◦YY - year (00..99)
+
+•6 - Platform System Time of the PPS pulse ◦HH - hours (0..23) 
+◦MM - minutes (0..59) 
+◦SS - seconds (0..59) 
+◦UUU - milliseconds (0..999)
+
+•7 - Uncertainty of PPS ◦MMM - milliseconds(0..999) 
+◦UUU - microseconds(0..999)
+
+•8 - PPS From fix ◦P - (0..1) (1) if PPS is associated to the last GPS FIX; (0) if it has been propagated or derived from one sat and assistance.
+
+•9 - AIDED PPS ◦A - (0..1) (1) if PPS is not based on GPS FIX, but on one satellite and assistance data; else (0).
+
+•10 - Enable/disable ◦O -(0..1) (1) if PPS output is on; (0) if off.
+
+•CC - checksum
+
+Some of this information cannot be obtained from GSV or GSA NMEA sentences
+
+  $PGLOR,1,SAT,xii,ccc,h,...,xii,ccc,h*CC<CR><LF>
+         1  2  3 4  5  6    3' 4' 5'  6'
+
+Where:
+•1 - Sentence version [1] 
+•2 - Sentence identifier 
+•3 - GNSS System ID, where x can be: G - GPS, R - GLONASS, Q - QZSS, S - SBAS. 
+•4 - GNSS Satellite ID, 01 to 32 
+•5 - C/N0 [dbHz] 
+•6 - SAT information in hex format; ◦bit0 - Pr Meas valid from ME 
+◦bit1 - Rr Meas valid from ME 
+◦bit2 - Pr Meas used in position computation 
+◦bit3 - Rr Meas used in position computation 
+◦bit4,5 - eph src (see the definition of GL_FIXSTAT_EPH_SRC) 
+◦bit6 - DGNSS used in position computation 
+◦bit7 - reserved ...
+
+•3' 4' 5' 6' - repeat 3,4,5,6 for additional satellites 
+•CC - checksum
+ $PGLOR,2,SIO,TxERR,0,RxERR,0,TxCNT,1000,RxCNT,1000,MLFRMPKT,0,DTMS,1000,DTIN,800,1000,DTOUT,800,1000,HATMD,0*CC
+        1           2       3          4          5          6      7         8   9          10  11         12
+
+The fields are:
+•1 - Sentence version [1] 
+•2 - Number of detected Tx errors, since ASIC was started 
+•3 - Number of detected Rx errors, since ASIC was started 
+•4 - Number of Tx bytes since previous $PGLOR,SIO message 
+•5 - Number of Rx bytes since previous $PGLOR,SIO message 
+•6 - Number of malformed packets received from ASIC, since ASIC started 
+•7 - Platform clock increment since last position report 
+•8 - Maximum time spent in GLL 
+•9 - Cumulative time spent in GLL 
+•10 - Maximum time spent outside of GLL 
+•11 - Cumulative time spent outside of GLL 
+•12 - Host/Asic time delta as observed in heartbeats. A sustained value outside +/-500 may indicate a serious communication problem. 
+•CC - checksum
+
+All times are reported in milliseconds.
+
+ 
+  $PGLOR,4,STA,hhmmss.ss,3.3,4.4,5.5,6.6,77,8,P,F,L,10,C,11,S,12,13,2,R,FFFF,TPEF,X,Y,OSC,10,P,10,P*CC<CR><LF>
+         1  2      3     4    5  6   7    8 9   A    B    C    D  E F    G    H   I J     K  L M  N  
+
+Where:
+•1 - Sentence version [4] 
+•2 - Sentence identifier 
+•3 - UTC 
+•4 - RTC initial error [seconds] 
+•5 - RTC uncertainty [seconds] 
+•6 - Oscillator offset [ppb] 
+•7 - Oscillator uncertainty [ppb] 
+•8 - Position uncertainty [ meters] 
+•9 - Internal velocity and track quality (this field is independent of RMC speed and track, and does not indicate speed or track validity): ◦0 - poor velocity, poor track 
+◦1 - good velocity, poor track 
+◦2 - poor velocity; good track 
+◦3 - good velocity; good track
+
+•A - Power saving mode status ◦D - disabled, always full power 
+◦F - enabled, now in full power mode 
+◦S - enabled, now in power save mode 
+◦G - enabled, now in GLONASS low power mode 
+◦SG - enabled, now in power save and GLONASS low power mode
+
+•B - HULA request for location input ◦0 - location input not needed 
+◦1 - location input requested
+
+•C - HULA position confidence ◦0 - unknown 
+◦1 - low 
+◦2 - med 
+◦3 - high
+
+•D - HULA position source is a bitmask presented as a hexadecimal number Check the API for details of the GL_POS_HULA_SRC enum: ◦GL_POS_HULA_SRC_NONE - 0 Neither GNSS, nor Sensor input was received or used 
+◦GL_POS_HULA_SRC_GNSS_LACK_SAT - (1 << 0) GNSS input was used (but not enough SVIDs to produce a fix) 
+◦GL_POS_HULA_SRC_GNSS - (1 << 1) GNSS input was used (enough SVIDs to produce a fix) 
+◦GL_POS_HULA_SRC_EXT_LOC - (1 << 2) External Location input was used 
+◦GL_POS_HULA_SRC_EXT_LOC_ALT - (1 << 3) Altitude from External Location input was used 
+◦GL_POS_HULA_SRC_EXT_ALT - (1 << 4) Altitude From External Altitude Sensor input was used 
+◦GL_POS_HULA_SRC_HEADING - (1 << 5) Heading sensor input was used 
+◦GL_POS_HULA_SRC_MOTION - (1 << 6) Motion sensor input was used 
+◦GL_POS_HULA_SRC_ACC - (1 << 7) Accelerometer input was used 
+◦GL_POS_HULA_SRC_GYR - (1 << 8) Gyro input was used 
+◦GL_POS_HULA_SRC_ALONG_TRACK_SPEED - (1 << 9) along track speed input was used 
+◦GL_POS_HULA_SRC_CROSS_TRACK_SPEED - (1 << 10) cross track speed input was used 
+◦GL_POS_HULA_SRC_VERTICAL_SPEED - (1 << 11) vertical speed input was used 
+◦GL_POS_HULA_SRC_TURNING - (1 << 12) turn sensor input was used 
+◦GL_POS_HULA_SRC_TURN_RATE - (1 << 13) turn rate sensor input was used 
+◦GL_POS_HULA_SRC_MOUNT - (1 << 14) PND mounted state sensor input was used
+
+•E - accumulated distance since start [meters ] 
+•F - Time Source (see ref:GL_TIME_VALIDITY) ◦0 - GL_TIME_UNKNOWN - time is invalid 
+◦1 - GL_TIME_FROM_STANDBY - time is restored after Standby 
+◦2 - GL_TIME_FROM_ASSIST - time is derived from assistance 
+◦3 - GL_TIME_FROM_POSITION - time is from position computation -- not supported yet 
+◦4 - GL_TIME_FROM_TOW - time is from TOW and WN decoding from 1 satellite 
+◦5 - GL_TIME_FROM_TOW_CONFIRMED - time is from TOW and WN decoding from more than 1 satellite
+
+•G - List of requested sensors for use as input to HULA, a bitmask presented as a hexadecimal number Check the API for details of the GL_POS_HULA_SRC enum: ◦GL_POS_HULA_SRC_EXT_LOC - (1 << 2) External Location Sensor was requested for use 
+◦GL_POS_HULA_SRC_EXT_ALT - (1 << 4) External Altitude Sensor was requested for use 
+◦GL_POS_HULA_SRC_HEADING - (1 << 5) Heading Sensor was requested for use 
+◦GL_POS_HULA_SRC_MOTION - (1 << 6) Motion Sensor was requested for use 
+◦GL_POS_HULA_SRC_ACC - (1 << 7) Accelerometer Sensor was requested for use 
+◦GL_POS_HULA_SRC_GYR - (1 << 8) Gyro Sensor was requested for use 
+◦GL_POS_HULA_SRC_ALONG_TRACK_SPEED - (1 << 9) along track speed Sensor was requested for use 
+◦GL_POS_HULA_SRC_CROSS_TRACK_SPEED - (1 << 10) cross track speed Sensor was requested for use 
+◦GL_POS_HULA_SRC_VERTICAL_SPEED - (1 << 11) vertical speed Sensor was requested for use 
+◦GL_POS_HULA_SRC_TURNING - (1 << 12) Turn Sensor was requested for use 
+◦GL_POS_HULA_SRC_TURN_RATE - (1 << 13) Turn Rate Sensor was requested for use 
+◦GL_POS_HULA_SRC_MOUNT - (1 << 14) PND Mounted State Sensor was requested for use
+
+•H - Aiding status: [tT][pP][eE][fF] ◦Time available (T), not available (t). 
+◦Position available (P), not available (p). 
+◦Ephemeris available (E), not available for 90% of all in view SVs (e). 
+◦Frequency available (F), not available (f).
+
+•I - Number of satellites with valid ephemeris 
+•J - Elapsed time in seconds 
+•K - Oscillator offset initial drift in [ppb] for first 10 sec interval 
+•L - Oscillator offset initial drift Pass/Fail criteria ◦If initial drift is less than 40ppb over first 10sec interval (P), otherwise (F)
+
+•M - Oscillator offset subsequent drift in [ppb] over 10 sec interval 
+•N - Oscillator offset subsequent drift Pass/Fail criterion ◦If subsequent drift is less than 10ppb over 10sec interval (P), otherwise (F)
+
+•CC - checksum
+
+Fields K, L, M, N above are associated with the OSC pass/fail criterion statistics.These fields publish results over 10 sec intervals,hence reports empty fields during n to n-9 interval.
+
+Internal velocity and track quality are documented in GL_FIX_STATUS (field ulInternalStatus). HULA Position source documented in GL_POS_HULA_SRC.
+
+[Version: 4]
+
+ 
+
+ 
+
+$PGLOR,1,SMx - Report GPS Summary Information 
+
+Pseudo-NMEA sentence $PGLOR,1,SM1 reports summary information about the current first fix (FF) or first measurement.
+
+This is typically information known up to the last piece of protocol is sent to an AGPS network entity (e.g. control plane or SUPL server).
+
+Pseudo-NMEA sentence $PGLOR,1,SM2 reports summary information about the network consequences of reporting the first fix or measurement. This is typically information that indicates network reaction or acknowledgement of GPS activities that may or may not happen.
+
+See $PGLOR,FIX for information about subsequent fixes.
+
+Summary 1 Sentence 
+
+  $PGLOR,1,SM1,<TTFFM>,<ATFF>,<RTFF>,<STIME>,<SP><STYPE><NS>,<ASST>,<RLS>,<SS>,<UTC>,<LAT>,<LON>,<ALT>,<HDOP>,<POSERR>*CC
+
+Where:
+•PGLOR Proprietary NMEA sentence identifier for Broadcom 
+•SM1 Summary 1 sentence identifier 
+•1 Version 1 of this sentence 
+•TTFFM "Time To First Fix" or "Time To First Measurement." Units are seconds. An empty field indicates too few measurements or a fix failure. 
+•ATFF Assistance time to first fix in seconds. An empty field indicates no assistance received. 
+•RTFF Request to first fix in seconds. An empty field indicates no report generated. 
+•STIME Request start until end of session sent to bearer. Unit are seconds An empty field indicates no session was involved. 
+•SP Session Protocol. Possible values are: ◦U - Unspecified (autonomous or local operation only) 
+◦S - SUPL 
+◦2 - 2G-RRLP (GSM) 
+◦3 - 3G-RRC (UMTS) 
+◦4 - 4G-LLP (LTE) 
+◦C - Unspecified Control Plane (if RIL refuse to expose which network it's using) 
+◦L - LBS
+
+•STYPE Session Type is a single letter: ◦U - Unspecified 
+◦S - Set Initiated 
+◦N - Network Initiated 
+◦W - Stay Warm (LBS sync?) 
+◦A - Get Assistance
+
+•NS Network status is a single letter: ◦C - Connected, Successful 
+◦F - The last protocol result failed. 
+◦
+D - Disconnected: The session ended without a protocol failure, but the protocol was too slow and didn't contribute assistance. 
+◦A - Autonomous, unsuccessful 
+◦U - Unspecified
+
+•ASST Assistance data provided. Possible values are a list: ◦L - Reference location 
+◦T - Reference time 
+◦E - Ephemeris 
+◦F - Fine time 
+◦C - Frequency (count-in) 
+◦A - Acquisition assistance 
+◦O - Other information (ionospheric, almanac, etc). An empty field indicates no assistance was provided.
+
+•RLS Reference Location Source ◦U - Unknown 
+◦A - Autonomous 
+◦S - SET-assisted 
+◦B - SET-based 
+◦C - Cell ID 
+◦L - Last known 
+◦Z - LBS An empty field is not possible.
+
+•SS Session status ◦0 - EOS Pass 
+◦<num> - EOS Fail. <num> is a per-bearer error code An empty field indicates no session was involved.
+
+•UTC Time of the fix in UTC 
+•LAT Latitude in degrees of the position (W is negative). 
+•LON Longitude in degrees of the position (S is negative). 
+•ALT Altitude in meters of the position. 
+•HDOP Horizontal dilution of precision of the fix. 
+•POSERR Estimated position error of the fix (in meters). An empty field indicates a position fix failure. 
+•CC Standard NMEA checksum
+
+EXAMPLE: 
+
+    $PGLOR,1,SM1,5.4,5,7,12.2,13.3,3NC,LTEC,B,0*56
+
+Summary 2 Sentence 
+
+  $PGLOR,1,SM2,<TYPE>,<ACK>,<NTIME>*CC
+
+Where:
+•PGLOR Proprietary NMEA sentence identifier for Broadcom 
+•SM2 Summary 2 sentence identifier for network status 
+•1 Version 1 of this sentence 
+•TYPE of summary report: ◦PROTO - Local bearer protocol send status. 
+◦POS - The network has compute-position status.
+
+•ACK Success or failure of the network type: ◦ACK - Success: the protocol was sent or position received. 
+◦NAK - Failure.
+
+•NTIME Time from end of session sent until this message received. Unit are seconds. 
+•CC Standard NMEA checksum
+
+If POS,ACK or POS,NAK is received before the session has ended, then NTIME is a negative number relative to the start of the current session.
+
+If PROTO is received before end of session, no PGLOR,1,SM2 is produced.
+
+EXAMPLE: 
+
+    $PGLOR,1,SM2,POS,ACK,3.3*34
+
+SEE ALSO: This NMEA sentence is programmed in the HAL. See glhal/src/glgps_hal_net.c for programming details.
+
+--------------------------------------------------------------------------------
+ 
+Timing Diagrams 
+
+These letters are used in the following diagram:
+•R - request received 
+•A - assistance data completely received 
+•S - positioning (or measurement) started 
+•F - position calculated 
+•M - measurements calculated 
+•P - position received 
+•I - unsuccessful periodic position reported 
+•E - End of session sent 
+•N - Network ack/nak of end of session
+
+In MS-Assisted TTFP is empty if position was not received. In MS-Based the TTPR is always empty.
+
+Network cases include SUPL, 2G, 3G, and 4G.
+
+ 
+
+Autonomous Timing 
+
+ATFF, TTPR, and Session Time are empty in autonomous cases.
+
+$PGLOR,NET - Report network information 
+
+  $PGLOR,NET,<TTFF>,<ATFF>,<RTFF>,<TTPR>,<STIME>,<SP><STYPE><NS>,<ASST>,<RLS>,<SS>*CC
+
+Where:
+•PGLOR Proprietary NMEA sentence identifier for Broadcom 
+•NET Sentence identifier 
+•TTFF Time To First Fix or Time To First Measurement. Unit are seconds An empty field indicates too few measurements or a fix failure 
+•ATFF Assistance time to first fix in seconds An empty field indicates no assistance received. 
+•RTFF Request to first fix in seconds An empty field indicates no report generated. 
+•TTPR Time to fix position report. An empty field indicates server didn't send fix to the set. 
+•STIME Request start until end of session from bearer Unit are seconds An empty field indicates no session was involved. 
+•SP Session Protocol. Possible values are: ◦U - Unspecified (autonomous or local operation only) 
+◦S - SUPL 
+◦2 - 2G-RRLP (GSM) 
+◦3 - 3G-RRC (UMTS) 
+◦4 - 4G-LLP (LTE) 
+◦C - Unspecified Control Plane (if RIL refuse to expose which network it's using) 
+◦L - LBS
+
+•STYPE Session Type. Possible values are: ◦U - Unspecified 
+◦S - Set Initiated 
+◦N - Network Initiated 
+◦W - Stay Warm (LBS sync?) 
+◦A - Get Assistance
+
+•NS Network status: Case 1. When the last protocol result was fail, the whole session will be regarded as F (failure). Case 2. When there were not a single failure but the session ended, the protocol was too slow and didn't contribute to assistance so it's D (disconnected). ◦U - Unspecified 
+◦C - Connected, Successful 
+◦D - Disconnected, Successful 
+◦A - Autonomous, Unsuccessful 
+◦F - Fail, Unsuccessful
+
+•ASST Assistance data provided. Possible values are a list: ◦L - Reference location 
+◦T - Reference time 
+◦E - Ephemeris 
+◦F - Fine time 
+◦C - Frequency (count-in) 
+◦A - Acquisition assistance 
+◦O - Other information (ionospheric, almanac, etc). An empty field indicates no assistance was provided.
+
+•RLS Reference Location Source ◦U - Unknown 
+◦A - Autonomous 
+◦S - SET-assisted 
+◦B - SET-based 
+◦C - Cell ID 
+◦L - Last known 
+◦Z - LBS An empty field is not possible.
+
+•SS Session status ◦0 - EOS Pass 
+◦<num> - EOS Fail. <num> is a per-bearer error code An empty field indicates no session was involved.
+
+•CC Standard NMEA checksum
+
+EXAMPLE: 
+
+    $PGLOR,NET,5.4,5,7,12.2,13.3,3NC,LTEC,B,0*56
+
+SEE ALSO: This NMEA sentence is programmed in the HAL. See glhal/src/glgps_hal_net.c for programming details.
+ 
+--------------------------------------------------------------------------------
+
+Timing Diagrams 
+
+These letters are used in the following diagram:
+•R - request received 
+•A - assistance data completely received 
+•S - positioning (or measurement) started 
+•F - position calculated 
+•M - measurements calculated 
+•P - position received 
+•V - successful periodic position reported 
+•I - unsuccesful periodic position reported 
+•E - End of session. Includes bearer pass/fail indication
+
+In MS-Assisted TTPR is empty if position was not received. In MS-Based the TTPR is always empty.
+
+Network cases include SUPL, 2G, 3G, and 4G.
+
+Autonomous Timing 
+
+ATFF, TTPR, and Session Time are empty in autonomous cases.
+
+ 
+
+ 
+
+Single shot 
+
+     (autonomous single shot)
+     |
+     R------------------S--------------------------------F------------> time
+     |                  |                                |
+     |                  +------------- TTFF -------------+
+     +--------------------- RTFF ------------------------+
+
+Periodic 
+
+Subsequent fixes (TTF) are reported in PGLOR,FIX. See pglor_fix.
+
+     (autonomous periodic)
+     |
+     R---S----------F---------I----------F---------------F------------> time
+     |   |          |                    |               |
+     |   +-- TTFF --+                    |               |
+     +---- RTFF ----+------- (TTF) ------+---- (TTF) ----+
+
+--------------------------------------------------------------------------------
+
+Set Initiated Timing 
+
+Session Time is empty.
+
+MS-Based 
+
+     (SILR - MS-Based)
+     |               NTIME (suppressed)
+     |               +--+
+     |               |  |
+     R--------AAAAA--E--N--S---------------------------I----F----F----> time
+     |            |  |     |                                |
+     |            |  |     +------------- TTFF -------------+
+     |            +--+-------------- ATFF ------------------+
+     +---------------+-------- RTFF ------------------------+
+     +-- Sess. Time -+
+
+If TTPR is received before E, then it is reported in SM2 as a negative number relative to S:
+
+     (SILR - MS-Assisted)                                       NTIME
+     |               +---- TTPR (-position received) -------+   +--+
+     |               |                                      |   |  |
+     R---------AAAA--S--------------------------------M-----P---E--N---> time
+     |            |  |                                |         |
+     |            |  +------------- TTFM -------------+         |
+     |            +----------- ATFF ------------------+         |
+     +------------------ RTFF ------------------------+         |
+     +------------------ Session Time --------------------------+
+
+If TTPR is received after N, it is reported in SM2 as a positive number relative to E:
+
+                  +---- TTPR (+position received) -------+
+                  |                                      |
+     ...----M-----E-------N-----N------------------------P------> time
+
+--------------------------------------------------------------------------------
+
+Network Initiated Timing 
+
+     (NILR MS-Based)                                            NTIME
+     |                                                          +--+
+     |                                                          |  |
+     R-------AAA-----S----------------------I---------F---I-----E--N---> time
+     |         |     |                                |         |
+     |         |     +------------- TTFF -------------+         |
+     |         +-------------- ATFF ------------------+         |
+     +------------------ RTFF ------------------------+         |
+     +------------------ Session Time --------------------------+
+
+MS-Assisted 
+
+If TTPR is received before N, it is reported in SM2 as a negative number relative to S:
+
+     (NILR MS-Assisted)                                          NTIME
+     |              +---- TTFP (-position received)--------+     +--+
+     |              |                                      |     |  |
+     R----------A---S--------------------------------M-----P-----E--N--> time
+     |          |   |                                |           |
+     |          |   +------------- TTFM -------------+           |
+     |          +------------ ATFF ------------------+           |
+     +----------------- RTFF ------------------------+           |
+     +----------------- Session Time ----------------------------+ 
